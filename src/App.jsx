@@ -216,6 +216,18 @@ function Hero() {
           <span className="cursor-blink" />
         </div>
 
+        <div className="hero-company-strip" aria-label="Companies worked at">
+          <span className="hero-company-label">Experience at</span>
+          <div className="hero-company-logos">
+            <span className="hero-company-logo-wrap">
+              <img src="/company/morgan-stanley.png" alt="Morgan Stanley logo" className="hero-company-logo hero-company-logo-ms" />
+            </span>
+            <span className="hero-company-logo-wrap">
+              <img src="/company/amazon.svg" alt="Amazon logo" className="hero-company-logo hero-company-logo-amz" />
+            </span>
+          </div>
+        </div>
+
         {/* CTA Buttons */}
         <div className="hero-actions">
           <a href="#projects" className="btn-primary" onClick={e => { e.preventDefault(); scrollToSection('projects') }}>
@@ -282,32 +294,37 @@ function About() {
             I thrive at the intersection of <strong>competitive problem-solving</strong> and <strong>engineering pragmatism</strong> — 
             where algorithmic thinking meets real-world architecture decisions.
           </p>
+        </div>
 
-          <div className="about-education">
+        <div className="about-side fade-in" ref={statsRef}>
+          <div className="glass-card about-education-card">
             <div className="edu-item">
               <div className="edu-icon">🎓</div>
               <div className="edu-info">
                 <h4>Indian Institute of Information Technology, Lucknow</h4>
-                <p>B.Tech — Computer Science Engineering · Nov 2022 – Jun 2026</p>
-                <span className="cgpa">CGPA: 9.01 / 10 · SGPA: 9.5 / 10</span>
+                <p>B.Tech · Computer Science · Nov 2022 – Jun 2026</p>
+                <div className="edu-metrics">
+                  <span className="cgpa">CGPA: 9.01 / 10</span>
+                  <span className="cgpa">SGPA: 9.5 / 10</span>
+                </div>
               </div>
             </div>
           </div>
-        </div>
 
-        {/* Stats Grid */}
-        <div className="stats-grid fade-in" ref={statsRef}>
-          {[
-            { number: '40K+', label: 'TPS Handled\nat Amazon' },
-            { number: '9.01', label: 'CGPA at\nIIIT Lucknow' },
-            { number: '1500+', label: 'Problems\nSolved' },
-            { number: '3+', label: 'Internships\nat Top Firms' },
-          ].map((s, i) => (
-            <div className="glass-card stat-card" key={i}>
-              <div className="stat-number gradient-text-blue">{s.number}</div>
-              <div className="stat-label" style={{ whiteSpace: 'pre-line' }}>{s.label}</div>
-            </div>
-          ))}
+          {/* Stats Grid */}
+          <div className="stats-grid">
+            {[
+              { number: '40K+', label: 'TPS Handled\nat Amazon' },
+              { number: '9.01', label: 'CGPA at\nIIIT Lucknow' },
+              { number: '1500+', label: 'Problems\nSolved' },
+              { number: '3+', label: 'Internships\nat Top Firms' },
+            ].map((s, i) => (
+              <div className="glass-card stat-card" key={i}>
+                <div className="stat-number gradient-text-blue">{s.number}</div>
+                <div className="stat-label" style={{ whiteSpace: 'pre-line' }}>{s.label}</div>
+              </div>
+            ))}
+          </div>
         </div>
       </div>
     </Section>
@@ -320,11 +337,14 @@ function Experience() {
     {
       role: 'Technology Spring Analyst',
       company: 'Morgan Stanley',
+      companyLogo: '/company/morgan-stanley.png',
+      companyLogoAlt: 'Morgan Stanley logo',
       location: 'Bangalore, India',
       period: 'Jan 2026 – Present',
       current: true,
       dotClass: 'exp-dot-ms',
-      icon: '🏦',
+      highlights: ['60+ Apps', '6K Logs/Day', 'React + FastAPI'],
+      tech: ['React.js', 'FastAPI', 'MongoDB', 'Python', 'Cron Jobs'],
       bullets: [
         'Engineered a centralized log retention system from scratch using React.js and FastAPI to track change management events across 60+ internal applications.',
         'Implemented cron job ingestion of ~6,000 daily logs (~500 API requests/day) into MongoDB, bypassing Splunk\'s 90-day retention limit for enterprise analytics.',
@@ -333,11 +353,14 @@ function Experience() {
     {
       role: 'Software Dev Engineer Intern',
       company: 'Amazon',
+      companyLogo: '/company/amazon.svg',
+      companyLogoAlt: 'Amazon logo',
       location: 'Hyderabad, India',
       period: 'Jul 2025 – Dec 2025',
       current: false,
       dotClass: 'exp-dot-amz',
-      icon: '📦',
+      highlights: ['50K TPS', '99% API Coverage', '4 Regional Fleets'],
+      tech: ['Java', 'Spring Boot', 'AWS', 'Cell Architecture', 'Testing'],
       bullets: [
         'Built a Tier-1 delivery planning service architecture from scratch handling 40,000–50,000 TPS of global order traffic.',
         'Designed a deployment stack using Cell-based Architecture, partitioning incoming global traffic by input data to route requests across 4 region-specific isolated fleets.',
@@ -347,11 +370,14 @@ function Experience() {
     {
       role: 'Technology Summer Analyst',
       company: 'Morgan Stanley',
+      companyLogo: '/company/morgan-stanley.png',
+      companyLogoAlt: 'Morgan Stanley logo',
       location: 'Bangalore, India',
       period: 'May 2025 – Jul 2025',
       current: false,
       dotClass: 'exp-dot-ms',
-      icon: '🏦',
+      highlights: ['1000+ PII Docs', 'Real-Time Remediation', 'Flask + React'],
+      tech: ['Flask', 'React.js', 'Data Security', 'API Integration'],
       bullets: [
         'Contributed to the internal data security platform by implementing a Flask-based API service to identify 1000+ sensitive PII documents.',
         'Integrated an endpoint with existing React.js dashboard, facilitating real-time permission remediation for security teams across the firm.',
@@ -371,23 +397,36 @@ function Experience() {
         {experiences.map((exp, i) => {
           const ref = useFadeIn()
           return (
-            <div className="glass-card exp-card fade-in" key={i} ref={ref}>
-              <div className={`exp-dot ${exp.dotClass}`}>{exp.icon}</div>
+            <div className={`glass-card exp-card fade-in${exp.current ? ' exp-card-current' : ''}`} key={i} ref={ref}>
               <div className="exp-body">
                 <div className="exp-header">
-                  <div>
-                    <div className="exp-company">{exp.company}</div>
+                  <div className="exp-header-main">
+                    <div className="exp-company-row">
+                      <div className={`exp-company-logo-wrap ${exp.dotClass}`}>
+                        <img src={exp.companyLogo} alt={exp.companyLogoAlt} className="exp-company-logo-large" loading="lazy" decoding="async" />
+                      </div>
+                    </div>
                     <div className="exp-role">{exp.role}</div>
                   </div>
-                  <div style={{ display: 'flex', alignItems: 'center', gap: '8px', flexWrap: 'wrap' }}>
+                  <div className="exp-meta">
                     {exp.current && <span className="badge-current">● Current</span>}
                     <span className="exp-period">{exp.period}</span>
+                    <span className="exp-location">📍 {exp.location}</span>
                   </div>
                 </div>
-                <div className="exp-location">📍 {exp.location}</div>
+                <div className="exp-highlights">
+                  {exp.highlights.map((h, idx) => (
+                    <span key={idx} className="exp-highlight-chip">{h}</span>
+                  ))}
+                </div>
                 <ul className="exp-bullets">
                   {exp.bullets.map((b, j) => <li key={j}>{b}</li>)}
                 </ul>
+                <div className="exp-tech-tags">
+                  {exp.tech.map((t, idx) => (
+                    <span key={idx} className="exp-tech-tag">{t}</span>
+                  ))}
+                </div>
               </div>
             </div>
           )
@@ -684,16 +723,32 @@ function Contact() {
   const [form, setForm] = useState({ name: '', email: '', message: '' })
   const [sent, setSent] = useState(false)
   const [sending, setSending] = useState(false)
+  const [copied, setCopied] = useState(false)
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault()
     setSending(true)
-    // Build a mailto: link from form fields — opens native email client, works with no backend
-    const subject = encodeURIComponent(`Portfolio Contact from ${form.name}`)
-    const body = encodeURIComponent(
-      `Hi Sridhar,\n\n${form.message}\n\nFrom: ${form.name}\nEmail: ${form.email}`
-    )
-    window.open(`mailto:sridharsuthapalli49@gmail.com?subject=${subject}&body=${body}`, '_blank')
+    const targetEmail = 'sridharsuthapalli49@gmail.com'
+    const subjectRaw = `Portfolio Contact from ${form.name}`
+    const bodyRaw = `Hi Sridhar,\n\n${form.message}\n\nFrom: ${form.name}\nEmail: ${form.email}`
+    const gmailUrl =
+      `https://mail.google.com/mail/?view=cm&fs=1&to=${encodeURIComponent(targetEmail)}` +
+      `&su=${encodeURIComponent(subjectRaw)}&body=${encodeURIComponent(bodyRaw)}`
+
+    try {
+      await navigator.clipboard.writeText(targetEmail)
+      setCopied(true)
+    } catch {
+      setCopied(false)
+    }
+
+    const popup = window.open(gmailUrl, '_blank', 'noopener,noreferrer')
+    if (!popup) {
+      const mailto =
+        `mailto:${targetEmail}?subject=${encodeURIComponent(subjectRaw)}&body=${encodeURIComponent(bodyRaw)}`
+      window.location.href = mailto
+    }
+
     setSent(true)
     setForm({ name: '', email: '', message: '' })
     setSending(false)
@@ -782,11 +837,11 @@ function Contact() {
               id="contact-submit"
               disabled={sending}
             >
-              {sending ? 'Opening email…' : 'Send via Email →'}
+              {sending ? 'Opening compose…' : 'Open Compose Window →'}
             </button>
             {sent && (
               <div className="form-success">
-                ✅ Your email client opened! Send the message from there.
+                ✅ Compose opened in a new tab. {copied ? 'Email copied to clipboard as backup.' : 'If it did not open, use the email shown on the left.'}
               </div>
             )}
           </form>
