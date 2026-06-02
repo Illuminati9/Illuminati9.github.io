@@ -1,10 +1,30 @@
-import { useState, useEffect, useRef } from 'react'
+import { useState, useEffect, useRef, useCallback } from 'react'
+
+/* ── Active Section Hook ───────────────────────────── */
+function useActiveSection(ids) {
+  const [active, setActive] = useState(ids[0])
+  useEffect(() => {
+    const observers = ids.map(id => {
+      const el = document.getElementById(id)
+      if (!el) return null
+      const obs = new IntersectionObserver(
+        ([entry]) => { if (entry.isIntersecting) setActive(id) },
+        { rootMargin: '-40% 0px -55% 0px' }
+      )
+      obs.observe(el)
+      return obs
+    })
+    return () => observers.forEach(o => o?.disconnect())
+  }, [])
+  return [active, setActive]
+}
 
 /* ── Navbar ────────────────────────────────────────── */
 function Navbar() {
   const [scrolled, setScrolled] = useState(false)
   const [menuOpen, setMenuOpen] = useState(false)
-  const [active, setActive] = useState('home')
+  const sectionIds = ['home', 'about', 'experience', 'projects', 'skills', 'cp', 'contact']
+  const [active, setActive] = useActiveSection(sectionIds)
 
   useEffect(() => {
     const onScroll = () => setScrolled(window.scrollY > 40)
@@ -632,20 +652,17 @@ function Contact() {
   const [sent, setSent] = useState(false)
   const [sending, setSending] = useState(false)
 
-  const handleSubmit = async (e) => {
+  const handleSubmit = (e) => {
     e.preventDefault()
     setSending(true)
-    // Using Formspree — replace FORM_ID with your actual Formspree form ID
-    try {
-      const res = await fetch('https://formspree.io/f/xpwrdqbn', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
-        body: JSON.stringify(form),
-      })
-      if (res.ok) { setSent(true); setForm({ name: '', email: '', message: '' }) }
-    } catch {
-      setSent(true) // graceful fallback
-    }
+    // Build a mailto: link from form fields — opens native email client, works with no backend
+    const subject = encodeURIComponent(`Portfolio Contact from ${form.name}`)
+    const body = encodeURIComponent(
+      `Hi Sridhar,\n\n${form.message}\n\nFrom: ${form.name}\nEmail: ${form.email}`
+    )
+    window.open(`mailto:sridharsuthapalli49@gmail.com?subject=${subject}&body=${body}`, '_blank')
+    setSent(true)
+    setForm({ name: '', email: '', message: '' })
     setSending(false)
   }
 
@@ -732,17 +749,100 @@ function Contact() {
               id="contact-submit"
               disabled={sending}
             >
-              {sending ? 'Sending…' : 'Send Message →'}
+              {sending ? 'Opening email…' : 'Send via Email →'}
             </button>
             {sent && (
               <div className="form-success">
-                ✅ Message sent! I'll get back to you soon.
+                ✅ Your email client opened! Send the message from there.
               </div>
             )}
           </form>
         </div>
       </div>
     </Section>
+  )
+}
+
+/* ── Scroll Progress Bar ───────────────────────────── */
+function ScrollProgress() {
+  const [progress, setProgress] = useState(0)
+  useEffect(() => {
+    const onScroll = () => {
+      const el = document.documentElement
+      const scrolled = el.scrollTop
+      const total = el.scrollHeight - el.clientHeight
+      setProgress(total > 0 ? (scrolled / total) * 100 : 0)
+    }
+    window.addEventListener('scroll', onScroll, { passive: true })
+    return () => window.removeEventListener('scroll', onScroll)
+  }, [])
+  return (
+    <div style={{
+      position: 'fixed', top: 0, left: 0, zIndex: 2000,
+      height: '2px', width: `${progress}%`,
+      background: 'linear-gradient(90deg, #007aff, #06b6d4)',
+      transition: 'width 0.1s linear',
+      pointerEvents: 'none',
+      boxShadow: '0 0 8px rgba(0,122,255,0.6)',
+    }} />
+  )
+}
+
+/* ── Back to Top Button ────────────────────────────── */
+function BackToTop() {
+  const [visible, setVisible] = useState(false)
+  useEffect(() => {
+    const onScroll = () => setVisible(window.scrollY > 400)
+    window.addEventListener('scroll', onScroll, { passive: true })
+    return () => window.removeEventListener('scroll', onScroll)
+  }, [])
+  return (
+    <button
+      id="back-to-top"
+      onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}
+      aria-label="Back to top"
+      style={{
+        position: 'fixed', bottom: '32px', right: '32px', zIndex: 1000,
+        width: '44px', height: '44px', borderRadius: '50%',
+        background: 'rgba(0,0,0,0.65)',
+        backdropFilter: 'blur(20px)',
+        border: '1px solid rgba(255,255,255,0.15)',
+        color: '#f5f5f7', fontSize: '1.1rem', cursor: 'pointer',
+        display: 'flex', alignItems: 'center', justifyContent: 'center',
+        boxShadow: '0 4px 20px rgba(0,0,0,0.4)',
+        opacity: visible ? 1 : 0,
+        transform: visible ? 'translateY(0) scale(1)' : 'translateY(12px) scale(0.85)',
+        transition: 'opacity 0.3s ease, transform 0.3s cubic-bezier(0.34,1.5,0.64,1)',
+        pointerEvents: visible ? 'auto' : 'none',
+      }}
+    >
+      ↑
+    </button>
+  )
+}
+
+/* ── Cursor Glow ───────────────────────────────────── */
+function CursorGlow() {
+  const [pos, setPos] = useState({ x: -200, y: -200 })
+  const [visible, setVisible] = useState(false)
+  useEffect(() => {
+    const move = (e) => { setPos({ x: e.clientX, y: e.clientY }); setVisible(true) }
+    const leave = () => setVisible(false)
+    window.addEventListener('mousemove', move)
+    window.addEventListener('mouseleave', leave)
+    return () => { window.removeEventListener('mousemove', move); window.removeEventListener('mouseleave', leave) }
+  }, [])
+  return (
+    <div style={{
+      position: 'fixed', zIndex: 0, pointerEvents: 'none',
+      left: pos.x, top: pos.y,
+      width: '400px', height: '400px',
+      borderRadius: '50%',
+      background: 'radial-gradient(circle, rgba(0,122,255,0.06) 0%, transparent 70%)',
+      transform: 'translate(-50%, -50%)',
+      opacity: visible ? 1 : 0,
+      transition: 'left 0.08s linear, top 0.08s linear, opacity 0.4s ease',
+    }} />
   )
 }
 
@@ -766,6 +866,8 @@ function Footer() {
 export default function App() {
   return (
     <>
+      <ScrollProgress />
+      <CursorGlow />
       <Background />
       <Navbar />
       <main style={{ position: 'relative', zIndex: 1 }}>
@@ -778,6 +880,7 @@ export default function App() {
         <Contact />
       </main>
       <Footer />
+      <BackToTop />
     </>
   )
 }
