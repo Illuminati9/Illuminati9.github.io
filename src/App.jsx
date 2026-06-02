@@ -107,17 +107,22 @@ function Loader({ onFinish }) {
     }, 30)
 
     return () => clearInterval(interval)
-  }, [])
+  }, [onFinish])
 
   useEffect(() => {
     if (progress >= 100) {
-      setTimeout(() => setFadeOut(true), 300)
-      setTimeout(() => {
+      const fadeTimeout = setTimeout(() => setFadeOut(true), 300)
+      const finishTimeout = setTimeout(() => {
         sessionStorage.setItem('loader-shown', '1')
         onFinish()
       }, 1100)
+
+      return () => {
+        clearTimeout(fadeTimeout)
+        clearTimeout(finishTimeout)
+      }
     }
-  }, [progress])
+  }, [progress, onFinish])
 
   return (
     <div className={`loader-overlay${fadeOut ? ' loader-fade-out' : ''}`}>
@@ -1470,9 +1475,12 @@ export default function App() {
   })
   const [theme, toggleTheme] = useTheme()
 
+  if (!loaded) {
+    return <Loader onFinish={() => setLoaded(true)} />
+  }
+
   return (
     <>
-      {!loaded && <Loader onFinish={() => setLoaded(true)} />}
       <ScrollProgress />
       <CursorGlow />
       <Background />
