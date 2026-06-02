@@ -50,7 +50,7 @@ function Navbar() {
 
         <div className="navbar-cta">
           <a
-            href="/Sridhar_Resume.pdf"
+            href="https://drive.google.com/file/d/1XahEoVfOsteb7ixsu8gVbq_H5o0-DF2k/view?usp=sharing"
             target="_blank"
             rel="noopener noreferrer"
             className="btn-resume"
@@ -175,7 +175,7 @@ function Hero() {
           <a href="#projects" className="btn-primary" onClick={e => { e.preventDefault(); document.getElementById('projects')?.scrollIntoView({ behavior: 'smooth' }) }}>
             View Projects ↗
           </a>
-          <a href="/Sridhar_Resume.pdf" target="_blank" rel="noopener noreferrer" className="btn-secondary">
+          <a href="https://drive.google.com/file/d/1XahEoVfOsteb7ixsu8gVbq_H5o0-DF2k/view?usp=sharing" target="_blank" rel="noopener noreferrer" className="btn-secondary">
             ↓ Download Resume
           </a>
         </div>
@@ -755,7 +755,7 @@ function Footer() {
         <div className="footer-links">
           <a href="https://github.com/Illuminati9" target="_blank" rel="noopener noreferrer" className="footer-link">GitHub</a>
           <a href="https://linkedin.com/in/sridharsuthapalli" target="_blank" rel="noopener noreferrer" className="footer-link">LinkedIn</a>
-          <a href="/Sridhar_Resume.pdf" target="_blank" rel="noopener noreferrer" className="footer-link">Resume</a>
+          <a href="https://drive.google.com/file/d/1XahEoVfOsteb7ixsu8gVbq_H5o0-DF2k/view?usp=sharing" target="_blank" rel="noopener noreferrer" className="footer-link">Resume</a>
         </div>
       </div>
     </footer>
