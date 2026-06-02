@@ -1,6 +1,8 @@
 import { useState, useEffect, useRef, useCallback } from 'react'
 
 const NAV_OFFSET = 84
+const RESUME_URL = 'https://drive.google.com/file/d/1XahEoVfOsteb7ixsu8gVbq_H5o0-DF2k/view?usp=sharing'
+const GITHUB_URL = 'https://github.com/Illuminati9'
 
 function scrollToSection(id, offset = NAV_OFFSET) {
   const el = document.getElementById(id)
@@ -28,8 +30,119 @@ function useActiveSection(ids) {
   return [active, setActive]
 }
 
+/* ── useInView Hook ────────────────────────────────── */
+function useInView(threshold = 0.12) {
+  const ref = useRef(null)
+  const [inView, setInView] = useState(false)
+  useEffect(() => {
+    const el = ref.current
+    if (!el) return
+    const obs = new IntersectionObserver(
+      ([entry]) => { if (entry.isIntersecting) { setInView(true); obs.unobserve(el) } },
+      { threshold }
+    )
+    obs.observe(el)
+    return () => obs.disconnect()
+  }, [])
+  return [ref, inView]
+}
+
+/* ── Count-Up Hook ─────────────────────────────────── */
+function useCountUp(target, duration = 1800, inView = false) {
+  const [value, setValue] = useState(0)
+  useEffect(() => {
+    if (!inView) return
+    const start = performance.now()
+    const step = (now) => {
+      const elapsed = now - start
+      const progress = Math.min(elapsed / duration, 1)
+      // ease-out cubic
+      const eased = 1 - Math.pow(1 - progress, 3)
+      setValue(Math.round(eased * target))
+      if (progress < 1) requestAnimationFrame(step)
+    }
+    requestAnimationFrame(step)
+  }, [inView, target, duration])
+  return value
+}
+
+/* ── Theme Hook ────────────────────────────────────── */
+function useTheme() {
+  const [theme, setTheme] = useState(() => {
+    if (typeof window !== 'undefined') {
+      return localStorage.getItem('portfolio-theme') || 'dark'
+    }
+    return 'dark'
+  })
+
+  useEffect(() => {
+    document.documentElement.setAttribute('data-theme', theme)
+    localStorage.setItem('portfolio-theme', theme)
+  }, [theme])
+
+  const toggle = useCallback(() => {
+    setTheme(t => t === 'dark' ? 'light' : 'dark')
+  }, [])
+
+  return [theme, toggle]
+}
+
+/* ── Loader ────────────────────────────────────────── */
+function Loader({ onFinish }) {
+  const [progress, setProgress] = useState(0)
+  const [fadeOut, setFadeOut] = useState(false)
+
+  useEffect(() => {
+    const shown = sessionStorage.getItem('loader-shown')
+    if (shown) { onFinish(); return }
+
+    const interval = setInterval(() => {
+      setProgress(p => {
+        if (p >= 100) {
+          clearInterval(interval)
+          return 100
+        }
+        return p + 2
+      })
+    }, 30)
+
+    return () => clearInterval(interval)
+  }, [])
+
+  useEffect(() => {
+    if (progress >= 100) {
+      setTimeout(() => setFadeOut(true), 300)
+      setTimeout(() => {
+        sessionStorage.setItem('loader-shown', '1')
+        onFinish()
+      }, 1100)
+    }
+  }, [progress])
+
+  return (
+    <div className={`loader-overlay${fadeOut ? ' loader-fade-out' : ''}`}>
+      <div className="loader-content">
+        <div className="loader-logos">
+          <div className="loader-logo-tile">
+            <img src="/company/morgan-stanley.png" alt="Morgan Stanley" className="loader-logo-img" />
+          </div>
+          <div className="loader-logo-divider">×</div>
+          <div className="loader-logo-tile">
+            <img src="/company/amazon.svg" alt="Amazon" className="loader-logo-img" />
+          </div>
+        </div>
+        <div className="loader-name">Sridhar Suthapalli</div>
+        <div className="loader-tagline">Software Engineer</div>
+        <div className="loader-bar-track">
+          <div className="loader-bar-fill" style={{ width: `${progress}%` }} />
+        </div>
+      </div>
+    </div>
+  )
+}
+
 /* ── Navbar ────────────────────────────────────────── */
-function Navbar() {
+function Navbar({ theme, toggleTheme }) {
   const [scrolled, setScrolled] = useState(false)
   const [menuOpen, setMenuOpen] = useState(false)
   const sectionIds = ['home', 'about', 'experience', 'projects', 'skills', 'cp', 'contact']
@@ -84,7 +197,27 @@ function Navbar() {
 
         <div className="navbar-cta">
           <a
-            href="https://drive.google.com/file/d/1XahEoVfOsteb7ixsu8gVbq_H5o0-DF2k/view?usp=sharing"
+            href="https://github.com/Illuminati9/Illuminati9.github.io"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="theme-toggle"
+            aria-label="View source on GitHub"
+            title="View source on GitHub"
+          >
+            <svg viewBox="0 0 24 24" fill="currentColor" style={{ width: '18px', height: '18px' }}>
+              <path d="M12 0C5.374 0 0 5.373 0 12c0 5.302 3.438 9.8 8.207 11.387.599.111.793-.261.793-.577v-2.234c-3.338.726-4.033-1.416-4.033-1.416-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.839 1.237 1.839 1.237 1.07 1.834 2.807 1.304 3.492.997.107-.775.418-1.305.762-1.604-2.665-.305-5.467-1.334-5.467-5.931 0-1.311.469-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.301 1.23A11.509 11.509 0 0112 5.803c1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.874.118 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.807 5.624-5.479 5.921.43.372.823 1.102.823 2.222v3.293c0 .319.192.694.801.576C20.566 21.797 24 17.3 24 12c0-6.627-5.373-12-12-12z"/>
+            </svg>
+          </a>
+          <button
+            className="theme-toggle"
+            onClick={toggleTheme}
+            aria-label={`Switch to ${theme === 'dark' ? 'light' : 'dark'} mode`}
+            title={`Switch to ${theme === 'dark' ? 'light' : 'dark'} mode`}
+          >
+            {theme === 'dark' ? '☀️' : '🌙'}
+          </button>
+          <a
+            href={RESUME_URL}
             target="_blank"
             rel="noopener noreferrer"
             className="btn-resume"
@@ -175,6 +308,43 @@ function Section({ id, children, className = '' }) {
   )
 }
 
+/* ── Hero Timeline ─────────────────────────────────── */
+function HeroTimeline() {
+  const [drawn, setDrawn] = useState(false)
+  useEffect(() => {
+    const t = setTimeout(() => setDrawn(true), 600)
+    return () => clearTimeout(t)
+  }, [])
+
+  const nodes = [
+    { label: 'IIIT-L', period: 'Nov \'22', color: '#007aff' },
+    { label: 'MS Summer', period: 'May \'25', color: '#00a1e0' },
+    { label: 'Amazon', period: 'Jul \'25', color: '#ff9900' },
+    { label: 'MS Spring', period: 'Jan \'26 → Now', color: '#00a1e0', current: true },
+  ]
+
+  return (
+    <div className="hero-timeline" aria-label="Career timeline">
+      <div className={`timeline-line${drawn ? ' timeline-drawn' : ''}`} />
+      <div className="timeline-nodes">
+        {nodes.map((n, i) => (
+          <button
+            key={i}
+            className={`timeline-node${n.current ? ' timeline-node-current' : ''}`}
+            onClick={() => scrollToSection('experience')}
+            style={{ '--node-color': n.color }}
+            aria-label={`${n.label} — ${n.period}`}
+          >
+            <div className="timeline-dot" />
+            <div className="timeline-node-label">{n.label}</div>
+            <div className="timeline-node-period">{n.period}</div>
+          </button>
+        ))}
+      </div>
+    </div>
+  )
+}
+
 /* ── Hero Section ──────────────────────────────────── */
 function Hero() {
   const phrases = [
@@ -200,9 +370,9 @@ function Hero() {
             fetchPriority="high"
             decoding="async"
           />
-          <div className="hero-status-badge">
+          <div className="hero-status-badge hero-status-highlight">
             <span className="status-dot" />
-            Available for Opportunities
+            <span>Available for <strong>2026 Grad</strong> Opportunities</span>
           </div>
         </div>
 
@@ -232,10 +402,13 @@ function Hero() {
           <a href="#projects" className="btn-primary" onClick={e => { e.preventDefault(); scrollToSection('projects') }}>
             View Projects ↗
           </a>
-          <a href="https://drive.google.com/file/d/1XahEoVfOsteb7ixsu8gVbq_H5o0-DF2k/view?usp=sharing" target="_blank" rel="noopener noreferrer" className="btn-secondary">
+          <a href={RESUME_URL} target="_blank" rel="noopener noreferrer" className="btn-secondary">
             Resume ↗
           </a>
         </div>
+
+        {/* Timeline */}
+        <HeroTimeline />
 
         {/* Social Links */}
         <div className="hero-socials">
@@ -243,11 +416,11 @@ function Hero() {
             <svg className="social-icon" viewBox="0 0 24 24" fill="currentColor"><path d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433a2.062 2.062 0 01-2.063-2.065 2.064 2.064 0 112.063 2.065zm1.782 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.222 0h.003z"/></svg>
             LinkedIn <span className="social-arrow">↗</span>
           </a>
-          <a href="https://github.com/Illuminati9" target="_blank" rel="noopener noreferrer" className="social-link" id="hero-github">
+          <a href={GITHUB_URL} target="_blank" rel="noopener noreferrer" className="social-link" id="hero-github">
             <svg className="social-icon" viewBox="0 0 24 24" fill="currentColor"><path d="M12 0C5.374 0 0 5.373 0 12c0 5.302 3.438 9.8 8.207 11.387.599.111.793-.261.793-.577v-2.234c-3.338.726-4.033-1.416-4.033-1.416-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.839 1.237 1.839 1.237 1.07 1.834 2.807 1.304 3.492.997.107-.775.418-1.305.762-1.604-2.665-.305-5.467-1.334-5.467-5.931 0-1.311.469-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.301 1.23A11.509 11.509 0 0112 5.803c1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.874.118 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.807 5.624-5.479 5.921.43.372.823 1.102.823 2.222v3.293c0 .319.192.694.801.576C20.566 21.797 24 17.3 24 12c0-6.627-5.373-12-12-12z"/></svg>
             GitHub <span className="social-arrow">↗</span>
           </a>
-          <a href="https://codeforces.com/profile/Illuminati9" target="_blank" rel="noopener noreferrer" className="social-link" id="hero-cf">
+          <a href="https://codeforces.com/profile/SridharSuthapalli" target="_blank" rel="noopener noreferrer" className="social-link" id="hero-cf">
             <svg className="social-icon" viewBox="0 0 24 24" fill="currentColor"><path d="M4.5 7.5C5.328 7.5 6 8.172 6 9v10.5c0 .828-.672 1.5-1.5 1.5h-3C.672 21 0 20.328 0 19.5V9c0-.828.672-1.5 1.5-1.5h3zm9-4.5c.828 0 1.5.672 1.5 1.5V19.5c0 .828-.672 1.5-1.5 1.5h-3c-.828 0-1.5-.672-1.5-1.5V4.5C9 3.672 9.672 3 10.5 3h3zm9 7.5c.828 0 1.5.672 1.5 1.5v9c0 .828-.672 1.5-1.5 1.5h-3c-.828 0-1.5-.672-1.5-1.5v-9c0-.828.672-1.5 1.5-1.5h3z"/></svg>
             Codeforces <span className="social-arrow">↗</span>
           </a>
@@ -272,7 +445,27 @@ function Hero() {
 /* ── About Section ─────────────────────────────────── */
 function About() {
   const ref = useFadeIn()
-  const statsRef = useFadeIn()
+  const sideRef = useFadeIn()
+  const [statsInViewRef, statsInView] = useInView(0.3)
+
+  // Combined ref: attaches both useFadeIn and useInView to the same element
+  const statsRef = useCallback(node => {
+    sideRef.current = node
+    statsInViewRef.current = node
+    // Trigger useFadeIn observer manually
+    if (node) {
+      const obs = new IntersectionObserver(
+        ([entry]) => { if (entry.isIntersecting) { node.classList.add('visible'); obs.unobserve(node) } },
+        { threshold: 0.12 }
+      )
+      obs.observe(node)
+    }
+  }, [])
+
+  const tps = useCountUp(40, 1800, statsInView)
+  const cgpa = useCountUp(901, 1800, statsInView) // will format as 9.01
+  const problems = useCountUp(1500, 2000, statsInView)
+  const internships = useCountUp(3, 1200, statsInView)
 
   return (
     <Section id="about">
@@ -298,7 +491,9 @@ function About() {
         <div className="about-side fade-in" ref={statsRef}>
           <div className="glass-card about-education-card">
             <div className="edu-item">
-              <div className="edu-icon">🎓</div>
+              <div className="edu-icon" style={{ padding: '6px', background: 'transparent', border: 'none' }}>
+                <img src="/college/iiitl.png" alt="IIIT-L logo" style={{ width: '100%', height: '100%', objectFit: 'contain' }} />
+              </div>
               <div className="edu-info">
                 <h4>Indian Institute of Information Technology, Lucknow</h4>
                 <p>B.Tech · Computer Science · Nov 2022 – Jun 2026</p>
@@ -310,16 +505,18 @@ function About() {
             </div>
           </div>
 
-          {/* Stats Grid */}
+          {/* Stats Grid with Count-Up */}
           <div className="stats-grid">
             {[
-              { number: '40K+', label: 'TPS Handled\nat Amazon' },
-              { number: '9.01', label: 'CGPA at\nIIIT Lucknow' },
-              { number: '1500+', label: 'Problems\nSolved' },
-              { number: '3+', label: 'Internships\nat Top Firms' },
+              { value: tps, suffix: 'K+', label: 'TPS Handled\nat Amazon' },
+              { value: cgpa, suffix: '', label: 'CGPA at\nIIIT Lucknow', format: v => (v / 100).toFixed(2) },
+              { value: problems, suffix: '+', label: 'Problems\nSolved' },
+              { value: internships, suffix: '+', label: 'Internships\nat Top Firms' },
             ].map((s, i) => (
               <div className="glass-card stat-card" key={i}>
-                <div className="stat-number gradient-text-blue">{s.number}</div>
+                <div className="stat-number gradient-text-blue">
+                  {s.format ? s.format(s.value) : s.value}{s.suffix}
+                </div>
                 <div className="stat-label" style={{ whiteSpace: 'pre-line' }}>{s.label}</div>
               </div>
             ))}
@@ -447,8 +644,9 @@ function Projects() {
       </p>
 
       <div className="projects-grid fade-in" ref={ref}>
-        {/* Guardian Vision */}
-        <div className="glass-card project-card">
+        {/* Guardian Vision — Featured */}
+        <div className="glass-card project-card project-card-featured">
+          <div className="project-featured-badge">★ Featured</div>
           <div className="project-glow" />
           <div className="project-icon">🛡️</div>
           <h3 className="project-title">Guardian Vision</h3>
@@ -472,7 +670,7 @@ function Projects() {
 
           <div className="project-link-row">
             <a
-              href="https://github.com/Illuminati9"
+              href="https://github.com/Illuminati9/guardian-vision"
               target="_blank"
               rel="noopener noreferrer"
               className="project-link"
@@ -543,8 +741,21 @@ function Projects() {
   )
 }
 
-/* ── Skills Section ────────────────────────────────── */
+/* ── Skills Section (with Proficiency Bars) ────────── */
 function Skills() {
+  const [barsRef, barsInView] = useInView(0.2)
+
+  const featured = [
+    { name: 'C++', level: 'Expert', pct: 95 },
+    { name: 'System Design', level: 'Expert', pct: 90 },
+    { name: 'Java / Spring Boot', level: 'Proficient', pct: 82 },
+    { name: 'Algorithms & DSA', level: 'Expert', pct: 95 },
+    { name: 'Python / FastAPI', level: 'Proficient', pct: 80 },
+    { name: 'React.js', level: 'Proficient', pct: 78 },
+    { name: 'AWS', level: 'Intermediate', pct: 60 },
+    { name: 'MongoDB', level: 'Intermediate', pct: 55 },
+  ]
+
   const groups = [
     {
       icon: '💻',
@@ -586,23 +797,221 @@ function Skills() {
         Languages, frameworks, databases and tools I work with every day.
       </p>
 
-      <div className="skills-container">
-        {groups.map((g, i) => {
-          const ref = useFadeIn()
-          return (
-            <div className="glass-card skill-group fade-in" key={i} ref={ref}>
-              <div className="skill-group-header">
-                <div className="skill-group-icon" style={{ background: g.color }}>{g.icon}</div>
-                <span className="skill-group-title">{g.title}</span>
+      <div className="skills-layout">
+        {/* Left — Proficiency Bars */}
+        <div className="skills-proficiency" ref={barsRef}>
+          <h3 className="skills-proficiency-title">Core Proficiencies</h3>
+          {featured.map((s, i) => (
+            <div className="skill-bar-row" key={i}>
+              <div className="skill-bar-info">
+                <span className="skill-bar-name">{s.name}</span>
+                <span className={`skill-bar-level skill-level-${s.level.toLowerCase()}`}>{s.level}</span>
               </div>
-              <div className="skill-tags">
-                {g.tags.map(t => <span className="skill-tag" key={t}>{t}</span>)}
+              <div className="skill-bar-track">
+                <div
+                  className="skill-bar-fill"
+                  style={{
+                    width: barsInView ? `${s.pct}%` : '0%',
+                    transitionDelay: `${i * 80}ms`,
+                  }}
+                />
               </div>
             </div>
-          )
-        })}
+          ))}
+        </div>
+
+        {/* Right — Tag Groups */}
+        <div className="skills-tags-side">
+          {groups.map((g, i) => {
+            const ref = useFadeIn()
+            return (
+              <div className="glass-card skill-group fade-in" key={i} ref={ref}>
+                <div className="skill-group-header">
+                  <div className="skill-group-icon" style={{ background: g.color }}>{g.icon}</div>
+                  <span className="skill-group-title">{g.title}</span>
+                </div>
+                <div className="skill-tags">
+                  {g.tags.map(t => <span className="skill-tag" key={t}>{t}</span>)}
+                </div>
+              </div>
+            )
+          })}
+        </div>
       </div>
     </Section>
+  )
+}
+
+/* ── CF Rating Chart ───────────────────────────────── */
+function CFRatingChart() {
+  const [data, setData] = useState(null)
+  const [loading, setLoading] = useState(true)
+  const [error, setError] = useState(null)
+  const [tooltip, setTooltip] = useState(null)
+  const svgRef = useRef(null)
+
+  useEffect(() => {
+    fetch('https://codeforces.com/api/user.rating?handle=sridharsuthapalli')
+      .then(r => r.json())
+      .then(d => {
+        if (d.status === 'OK') setData(d.result)
+        else setError('Failed to load')
+      })
+      .catch(() => setError('Network error'))
+      .finally(() => setLoading(false))
+  }, [])
+
+  if (loading) {
+    return (
+      <div className="cf-chart-skeleton">
+        <div className="cf-chart-skeleton-bar" />
+        <div className="cf-chart-skeleton-bar short" />
+        <div className="cf-chart-skeleton-bar" />
+      </div>
+    )
+  }
+
+  if (error || !data || data.length === 0) {
+    return <div className="cf-chart-error">Unable to load Codeforces rating history.</div>
+  }
+
+  // Chart dimensions
+  const W = 700, H = 280, PAD = { top: 30, right: 20, bottom: 40, left: 50 }
+  const chartW = W - PAD.left - PAD.right
+  const chartH = H - PAD.top - PAD.bottom
+
+  const ratings = data.map(d => d.newRating)
+  const minR = Math.min(...ratings) - 50
+  const maxR = Math.max(...ratings) + 50
+  const minT = data[0].ratingUpdateTimeSeconds
+  const maxT = data[data.length - 1].ratingUpdateTimeSeconds
+
+  const x = (t) => PAD.left + ((t - minT) / (maxT - minT)) * chartW
+  const y = (r) => PAD.top + chartH - ((r - minR) / (maxR - minR)) * chartH
+
+  // Rating bands (Codeforces-like)
+  const bands = [
+    { min: 0, max: 1200, color: 'rgba(128,128,128,0.08)', label: 'Newbie' },
+    { min: 1200, max: 1400, color: 'rgba(0,128,0,0.06)', label: 'Pupil' },
+    { min: 1400, max: 1600, color: 'rgba(3,168,158,0.06)', label: 'Specialist' },
+    { min: 1600, max: 1900, color: 'rgba(0,0,255,0.06)', label: 'Expert' },
+    { min: 1900, max: 2100, color: 'rgba(170,0,170,0.06)', label: 'CM' },
+    { min: 2100, max: 2400, color: 'rgba(255,140,0,0.06)', label: 'Master' },
+  ]
+
+  const pathD = data.map((d, i) => {
+    const px = x(d.ratingUpdateTimeSeconds)
+    const py = y(d.newRating)
+    return `${i === 0 ? 'M' : 'L'}${px},${py}`
+  }).join(' ')
+
+  // Y-axis ticks
+  const yTicks = []
+  for (let r = Math.ceil(minR / 200) * 200; r <= maxR; r += 200) {
+    yTicks.push(r)
+  }
+
+  const handleMouseMove = (e) => {
+    if (!svgRef.current) return
+    const rect = svgRef.current.getBoundingClientRect()
+    const mx = (e.clientX - rect.left) * (W / rect.width)
+    // find closest point
+    let closest = 0, minDist = Infinity
+    data.forEach((d, i) => {
+      const dist = Math.abs(x(d.ratingUpdateTimeSeconds) - mx)
+      if (dist < minDist) { minDist = dist; closest = i }
+    })
+    const d = data[closest]
+    const delta = d.newRating - d.oldRating
+    setTooltip({
+      x: x(d.ratingUpdateTimeSeconds),
+      y: y(d.newRating),
+      name: d.contestName,
+      rating: d.newRating,
+      delta,
+      date: new Date(d.ratingUpdateTimeSeconds * 1000).toLocaleDateString('en-US', { month: 'short', year: 'numeric' }),
+    })
+  }
+
+  return (
+    <div className="cf-chart-wrap">
+      <svg
+        ref={svgRef}
+        viewBox={`0 0 ${W} ${H}`}
+        className="cf-chart-svg"
+        onMouseMove={handleMouseMove}
+        onMouseLeave={() => setTooltip(null)}
+      >
+        {/* Rating bands */}
+        {bands.map((b, i) => {
+          const bandTop = Math.max(b.min, minR)
+          const bandBot = Math.min(b.max, maxR)
+          if (bandTop >= maxR || bandBot <= minR) return null
+          return (
+            <rect
+              key={i}
+              x={PAD.left}
+              y={y(bandBot)}
+              width={chartW}
+              height={y(bandTop) - y(bandBot)}
+              fill={b.color}
+            />
+          )
+        })}
+
+        {/* Y axis ticks */}
+        {yTicks.map(r => (
+          <g key={r}>
+            <line x1={PAD.left} y1={y(r)} x2={PAD.left + chartW} y2={y(r)} stroke="rgba(255,255,255,0.06)" strokeWidth="1" />
+            <text x={PAD.left - 8} y={y(r) + 4} fill="var(--text-tertiary)" fontSize="10" textAnchor="end" fontFamily="var(--font-system)">{r}</text>
+          </g>
+        ))}
+
+        {/* Line */}
+        <path d={pathD} fill="none" stroke="var(--accent)" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+
+        {/* Dots */}
+        {data.map((d, i) => (
+          <circle
+            key={i}
+            cx={x(d.ratingUpdateTimeSeconds)}
+            cy={y(d.newRating)}
+            r="3"
+            fill="var(--accent)"
+            stroke="var(--bg-primary)"
+            strokeWidth="1.5"
+          />
+        ))}
+
+        {/* Tooltip crosshair */}
+        {tooltip && (
+          <>
+            <line x1={tooltip.x} y1={PAD.top} x2={tooltip.x} y2={PAD.top + chartH} stroke="rgba(255,255,255,0.15)" strokeWidth="1" strokeDasharray="4,4" />
+            <circle cx={tooltip.x} cy={tooltip.y} r="5" fill="var(--accent)" stroke="#fff" strokeWidth="2" />
+          </>
+        )}
+      </svg>
+
+      {/* Tooltip popup */}
+      {tooltip && (
+        <div
+          className="cf-chart-tooltip"
+          style={{
+            left: `${(tooltip.x / W) * 100}%`,
+            top: `${(tooltip.y / H) * 100 - 14}%`,
+          }}
+        >
+          <div className="cf-tooltip-name">{tooltip.name}</div>
+          <div className="cf-tooltip-rating">
+            Rating: {tooltip.rating}
+            <span className={tooltip.delta >= 0 ? 'cf-tooltip-up' : 'cf-tooltip-down'}>
+              {tooltip.delta >= 0 ? '+' : ''}{tooltip.delta}
+            </span>
+          </div>
+          <div className="cf-tooltip-date">{tooltip.date}</div>
+        </div>
+      )}
+    </div>
   )
 }
 
@@ -625,7 +1034,7 @@ function CompetitiveProgramming() {
       detail: 'Global Rank 173 in Round 997',
       color: '#1ba9f5',
       glow: 'rgba(27,169,245,0.2)',
-      link: 'https://codeforces.com/profile/Illuminati9',
+      link: 'https://codeforces.com/profile/SridharSuthapalli',
     },
     {
       name: 'CodeChef',
@@ -657,6 +1066,7 @@ function CompetitiveProgramming() {
 
   const headerRef = useFadeIn()
   const achieveRef = useFadeIn()
+  const chartRef = useFadeIn()
 
   return (
     <Section id="cp" className="cp-section">
@@ -700,6 +1110,12 @@ function CompetitiveProgramming() {
             </a>
           )
         })}
+      </div>
+
+      {/* CF Rating Chart */}
+      <div className="glass-card cp-chart-card fade-in" ref={chartRef}>
+        <div className="cp-chart-title">Codeforces Rating History</div>
+        <CFRatingChart />
       </div>
 
       <div className="glass-card cp-achievements fade-in" ref={achieveRef}>
@@ -757,7 +1173,7 @@ function Contact() {
     { icon: '✉️', label: 'Email', value: 'sridharsuthapalli49@gmail.com', href: 'mailto:sridharsuthapalli49@gmail.com' },
     { icon: '💼', label: 'LinkedIn', value: 'linkedin.com/in/sridharsuthapalli', href: 'https://linkedin.com/in/sridharsuthapalli' },
     { icon: '🐙', label: 'GitHub', value: 'github.com/Illuminati9', href: 'https://github.com/Illuminati9' },
-    { icon: '🏆', label: 'Codeforces', value: 'codeforces.com/profile/Illuminati9', href: 'https://codeforces.com/profile/Illuminati9' },
+    { icon: '🏆', label: 'Codeforces', value: 'codeforces.com/profile/SridharSuthapalli', href: 'https://codeforces.com/profile/SridharSuthapalli' },
   ]
 
   const infoRef = useFadeIn()
@@ -888,18 +1304,10 @@ function BackToTop() {
       id="back-to-top"
       onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}
       aria-label="Back to top"
+      className="back-to-top-btn"
       style={{
-        position: 'fixed', bottom: '32px', right: '32px', zIndex: 1000,
-        width: '44px', height: '44px', borderRadius: '50%',
-        background: 'rgba(0,0,0,0.65)',
-        backdropFilter: 'blur(20px)',
-        border: '1px solid rgba(255,255,255,0.15)',
-        color: '#f5f5f7', fontSize: '1.1rem', cursor: 'pointer',
-        display: 'flex', alignItems: 'center', justifyContent: 'center',
-        boxShadow: '0 4px 20px rgba(0,0,0,0.4)',
         opacity: visible ? 1 : 0,
         transform: visible ? 'translateY(0) scale(1)' : 'translateY(12px) scale(0.85)',
-        transition: 'opacity 0.3s ease, transform 0.3s cubic-bezier(0.34,1.5,0.64,1)',
         pointerEvents: visible ? 'auto' : 'none',
       }}
     >
@@ -933,6 +1341,112 @@ function CursorGlow() {
   )
 }
 
+/* ── Open to Work Banner ───────────────────────────── */
+function OpenToWorkBanner() {
+  const [dismissed, setDismissed] = useState(() => {
+    return sessionStorage.getItem('otw-dismissed') === '1'
+  })
+
+  if (dismissed) return null
+
+  return (
+    <div className="otw-banner" id="open-to-work-banner">
+      <span className="otw-dot" />
+      <span className="otw-text">🎓 <strong>2026 Graduate</strong> — Actively seeking SDE New Grad roles · Available Jul 2026</span>
+      <button
+        className="otw-close"
+        aria-label="Dismiss banner"
+        onClick={() => {
+          setDismissed(true)
+          sessionStorage.setItem('otw-dismissed', '1')
+        }}
+      >
+        ✕
+      </button>
+    </div>
+  )
+}
+
+/* ── Keyboard Navigation ───────────────────────────── */
+function KeyboardNav({ setMenuOpen }) {
+  const [showModal, setShowModal] = useState(false)
+
+  useEffect(() => {
+    const handler = (e) => {
+      // Don't trigger if user is typing in an input
+      if (e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA' || e.target.isContentEditable) return
+
+      switch (e.key) {
+        case '?': setShowModal(s => !s); break
+        case 'Escape':
+          setShowModal(false)
+          if (setMenuOpen) setMenuOpen(false)
+          break
+        case 'g': case 'G':
+          if (!e.ctrlKey && !e.metaKey) window.open(GITHUB_URL, '_blank')
+          break
+        case 'r': case 'R':
+          if (!e.ctrlKey && !e.metaKey) window.open(RESUME_URL, '_blank')
+          break
+        case '1': scrollToSection('about'); break
+        case '2': scrollToSection('experience'); break
+        case '3': scrollToSection('projects'); break
+        case '4': scrollToSection('skills'); break
+        case '5': scrollToSection('cp'); break
+        case '6': scrollToSection('contact'); break
+        default: break
+      }
+    }
+    window.addEventListener('keydown', handler)
+    return () => window.removeEventListener('keydown', handler)
+  }, [setMenuOpen])
+
+  const shortcuts = [
+    { key: 'G', action: 'Open GitHub' },
+    { key: 'R', action: 'Open Resume' },
+    { key: '1', action: 'Jump to About' },
+    { key: '2', action: 'Jump to Experience' },
+    { key: '3', action: 'Jump to Projects' },
+    { key: '4', action: 'Jump to Skills' },
+    { key: '5', action: 'Jump to CP' },
+    { key: '6', action: 'Jump to Contact' },
+    { key: '?', action: 'Toggle this help' },
+    { key: 'Esc', action: 'Close modal / menu' },
+  ]
+
+  return (
+    <>
+      <button
+        className="kb-hint-btn"
+        onClick={() => setShowModal(true)}
+        aria-label="Show keyboard shortcuts"
+        title="Keyboard shortcuts (?)"
+      >
+        ?
+      </button>
+
+      {showModal && (
+        <div className="kb-modal-overlay" onClick={() => setShowModal(false)}>
+          <div className="kb-modal glass-card" onClick={e => e.stopPropagation()}>
+            <div className="kb-modal-header">
+              <h3>Keyboard Shortcuts</h3>
+              <button className="kb-modal-close" onClick={() => setShowModal(false)} aria-label="Close">✕</button>
+            </div>
+            <div className="kb-modal-list">
+              {shortcuts.map((s, i) => (
+                <div className="kb-shortcut-row" key={i}>
+                  <kbd className="kb-key">{s.key}</kbd>
+                  <span className="kb-action">{s.action}</span>
+                </div>
+              ))}
+            </div>
+          </div>
+        </div>
+      )}
+    </>
+  )
+}
+
 /* ── Footer ────────────────────────────────────────── */
 function Footer() {
   return (
@@ -940,9 +1454,9 @@ function Footer() {
       <div className="footer-inner">
         <p className="footer-copy">© 2026 Sridhar Suthapalli. Built with React + Vite.</p>
         <div className="footer-links">
-          <a href="https://github.com/Illuminati9" target="_blank" rel="noopener noreferrer" className="footer-link">GitHub</a>
+          <a href={GITHUB_URL} target="_blank" rel="noopener noreferrer" className="footer-link">GitHub</a>
           <a href="https://linkedin.com/in/sridharsuthapalli" target="_blank" rel="noopener noreferrer" className="footer-link">LinkedIn</a>
-          <a href="https://drive.google.com/file/d/1XahEoVfOsteb7ixsu8gVbq_H5o0-DF2k/view?usp=sharing" target="_blank" rel="noopener noreferrer" className="footer-link">Resume</a>
+          <a href={RESUME_URL} target="_blank" rel="noopener noreferrer" className="footer-link">Resume</a>
         </div>
       </div>
     </footer>
@@ -951,12 +1465,19 @@ function Footer() {
 
 /* ── App Root ───────────────────────────────────────── */
 export default function App() {
+  const [loaded, setLoaded] = useState(() => {
+    return sessionStorage.getItem('loader-shown') === '1'
+  })
+  const [theme, toggleTheme] = useTheme()
+
   return (
     <>
+      {!loaded && <Loader onFinish={() => setLoaded(true)} />}
       <ScrollProgress />
       <CursorGlow />
       <Background />
-      <Navbar />
+      <Navbar theme={theme} toggleTheme={toggleTheme} />
+      <KeyboardNav />
       <a href="#home" className="skip-link" onClick={(e) => { e.preventDefault(); scrollToSection('home', 0) }}>
         Skip to content
       </a>
@@ -970,6 +1491,7 @@ export default function App() {
         <Contact />
       </main>
       <Footer />
+      <OpenToWorkBanner />
       <BackToTop />
     </>
   )
