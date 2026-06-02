@@ -55,7 +55,7 @@ function Navbar() {
             rel="noopener noreferrer"
             className="btn-resume"
           >
-            ↓ Resume
+            Resume
           </a>
           <button
             className="navbar-hamburger"
@@ -176,7 +176,7 @@ function Hero() {
             View Projects ↗
           </a>
           <a href="https://drive.google.com/file/d/1XahEoVfOsteb7ixsu8gVbq_H5o0-DF2k/view?usp=sharing" target="_blank" rel="noopener noreferrer" className="btn-secondary">
-            ↓ Download Resume
+            Resume
           </a>
         </div>
 
