@@ -1,5 +1,14 @@
 import { useState, useEffect, useRef, useCallback } from 'react'
 
+const NAV_OFFSET = 84
+
+function scrollToSection(id, offset = NAV_OFFSET) {
+  const el = document.getElementById(id)
+  if (!el) return
+  const targetTop = el.getBoundingClientRect().top + window.scrollY - offset
+  window.scrollTo({ top: Math.max(targetTop, 0), behavior: 'smooth' })
+}
+
 /* ── Active Section Hook ───────────────────────────── */
 function useActiveSection(ids) {
   const [active, setActive] = useState(ids[0])
@@ -32,10 +41,15 @@ function Navbar() {
     return () => window.removeEventListener('scroll', onScroll)
   }, [])
 
+  useEffect(() => {
+    document.body.style.overflow = menuOpen ? 'hidden' : ''
+    return () => { document.body.style.overflow = '' }
+  }, [menuOpen])
+
   const scrollTo = (id) => {
     setMenuOpen(false)
     setActive(id)
-    document.getElementById(id)?.scrollIntoView({ behavior: 'smooth' })
+    scrollToSection(id)
   }
 
   const links = [
@@ -50,11 +64,11 @@ function Navbar() {
   return (
     <nav className={`navbar${scrolled ? ' scrolled' : ''}`}>
       <div className="navbar-inner">
-        <span className="navbar-logo" onClick={() => scrollTo('home')}>
+        <button className="navbar-logo" type="button" onClick={() => scrollTo('home')}>
           Sridhar S.
-        </span>
+        </button>
 
-        <ul className={`navbar-links${menuOpen ? ' open' : ''}`}>
+        <ul id="mobile-navigation" className={`navbar-links${menuOpen ? ' open' : ''}`}>
           {links.map(l => (
             <li key={l.id}>
               <a
@@ -80,12 +94,15 @@ function Navbar() {
           <button
             className="navbar-hamburger"
             aria-label="Toggle menu"
+            aria-expanded={menuOpen}
+            aria-controls="mobile-navigation"
             onClick={() => setMenuOpen(o => !o)}
           >
             <span /><span /><span />
           </button>
         </div>
       </div>
+      {menuOpen && <button className="menu-backdrop" type="button" aria-label="Close menu" onClick={() => setMenuOpen(false)} />}
     </nav>
   )
 }
@@ -174,7 +191,15 @@ function Hero() {
       <div className="hero-content">
         {/* Avatar */}
         <div className="hero-avatar-wrap">
-          <img src="/avatar.png" alt="Sridhar Suthapalli" className="hero-avatar" />
+          <img
+            src="/avatar.png"
+            alt="Sridhar Suthapalli"
+            className="hero-avatar"
+            width="120"
+            height="120"
+            fetchPriority="high"
+            decoding="async"
+          />
           <div className="hero-status-badge">
             <span className="status-dot" />
             Available for Opportunities
@@ -193,7 +218,7 @@ function Hero() {
 
         {/* CTA Buttons */}
         <div className="hero-actions">
-          <a href="#projects" className="btn-primary" onClick={e => { e.preventDefault(); document.getElementById('projects')?.scrollIntoView({ behavior: 'smooth' }) }}>
+          <a href="#projects" className="btn-primary" onClick={e => { e.preventDefault(); scrollToSection('projects') }}>
             View Projects ↗
           </a>
           <a href="https://drive.google.com/file/d/1XahEoVfOsteb7ixsu8gVbq_H5o0-DF2k/view?usp=sharing" target="_blank" rel="noopener noreferrer" className="btn-secondary">
@@ -878,6 +903,9 @@ export default function App() {
       <CursorGlow />
       <Background />
       <Navbar />
+      <a href="#home" className="skip-link" onClick={(e) => { e.preventDefault(); scrollToSection('home', 0) }}>
+        Skip to content
+      </a>
       <main style={{ position: 'relative', zIndex: 1 }}>
         <Hero />
         <About />
