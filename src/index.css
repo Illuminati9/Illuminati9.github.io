@@ -2632,6 +2632,27 @@ textarea:focus-visible {
     --section-padding: clamp(64px, 10vw, 84px) 0;
   }
 
+  .loader-content {
+    width: min(100%, 360px);
+    max-width: calc(100vw - 32px);
+  }
+
+  .loader-logos {
+    gap: 12px;
+    margin-bottom: 24px;
+  }
+
+  .loader-logo-tile {
+    width: 136px;
+    height: 48px;
+    padding: 8px 14px;
+  }
+
+  .loader-logo-img {
+    height: 18px;
+    max-width: 104px;
+  }
+
   .navbar {
     padding: 0 12px;
   }
@@ -2890,6 +2911,33 @@ textarea:focus-visible {
 }
 
 @media (max-width: 480px) {
+  .loader-content {
+    animation: none;
+  }
+
+  .loader-logo-tile {
+    width: 118px;
+    height: 42px;
+    padding: 7px 12px;
+  }
+
+  .loader-logo-img {
+    height: 16px;
+    max-width: 92px;
+  }
+
+  .loader-name {
+    font-size: 1.35rem;
+  }
+
+  .loader-tagline {
+    margin-bottom: 20px;
+  }
+
+  .loader-bar-track {
+    width: 170px;
+  }
+
   .navbar {
     padding: 0 8px;
   }
