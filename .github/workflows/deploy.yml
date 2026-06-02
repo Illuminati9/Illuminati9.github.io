@@ -1,0 +1,45 @@
+name: Deploy Portfolio to GitHub Pages
+
+on:
+  push:
+    branches:
+      - main   # Runs automatically on every push to main
+
+  workflow_dispatch:   # Also allows manual trigger from GitHub UI
+
+permissions:
+  contents: write   # Needed to push to gh-pages branch
+
+jobs:
+  build-and-deploy:
+    name: Build & Deploy
+    runs-on: ubuntu-latest
+
+    steps:
+      # 1. Check out your source code
+      - name: Checkout source
+        uses: actions/checkout@v4
+
+      # 2. Set up Node.js
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+
+      # 3. Install dependencies
+      - name: Install dependencies
+        run: npm ci
+
+      # 4. Build the Vite project
+      - name: Build
+        run: npm run build
+
+      # 5. Deploy the dist/ folder to gh-pages branch
+      - name: Deploy to GitHub Pages
+        uses: peaceiris/actions-gh-pages@v4
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          publish_dir: ./dist
+          publish_branch: gh-pages
+          commit_message: "ci: auto-deploy from main (${{ github.sha }})"
