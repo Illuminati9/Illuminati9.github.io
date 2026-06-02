@@ -207,7 +207,6 @@ function Hero() {
         </div>
 
         {/* Name */}
-        <p className="hero-eyebrow">Portfolio — 2026</p>
         <h1 className="hero-name">Sridhar Suthapalli</h1>
 
         {/* Typewriter */}
@@ -288,10 +287,10 @@ function About() {
         <div className="glass-card about-card fade-in" ref={ref}>
           <p className="about-text">
             I'm a <strong>software engineer</strong> currently working as a Technology Spring Analyst at <strong>Morgan Stanley, Bangalore</strong>. 
-            I build systems that scale — from log retention platforms handling 6,000+ daily events to delivery planning services processing 40,000–50,000 TPS at Amazon.
+            I build systems that scale, from log retention platforms handling 6,000+ daily events to delivery planning service infrastructure processing 40,000–50,000 TPS at Amazon.
           </p>
           <p className="about-text">
-            I thrive at the intersection of <strong>competitive problem-solving</strong> and <strong>engineering pragmatism</strong> — 
+            I thrive at the intersection of <strong>competitive problem-solving</strong> and <strong>engineering pragmatism</strong>,  
             where algorithmic thinking meets real-world architecture decisions.
           </p>
         </div>
@@ -362,7 +361,7 @@ function Experience() {
       highlights: ['50K TPS', '99% API Coverage', '4 Regional Fleets'],
       tech: ['Java', 'Spring Boot', 'AWS', 'Cell Architecture', 'Testing'],
       bullets: [
-        'Built a Tier-1 delivery planning service architecture from scratch handling 40,000–50,000 TPS of global order traffic.',
+        'Built a Tier-1 delivery planning service infrastructure from scratch handling 40,000–50,000 TPS of global order traffic.',
         'Designed a deployment stack using Cell-based Architecture, partitioning incoming global traffic by input data to route requests across 4 region-specific isolated fleets.',
         'Rewrote the regression testing framework to increase API traffic coverage from 45% to 99%, preventing production outages.',
       ],
@@ -512,11 +511,11 @@ function Projects() {
           </div>
         </div>
 
-        {/* Delivery Planning Service */}
+        {/* Delivery Planning Service Infrastructure */}
         <div className="glass-card project-card">
           <div className="project-glow" style={{ background: 'radial-gradient(circle, rgba(255,153,0,0.12), transparent 70%)' }} />
           <div className="project-icon" style={{ background: 'rgba(255,153,0,0.1)', borderColor: 'rgba(255,153,0,0.2)' }}>🚀</div>
-          <h3 className="project-title">Delivery Planning Service</h3>
+          <h3 className="project-title">Delivery Planning Service Infrastructure</h3>
 
           <div className="project-stat-badges">
             <span className="project-stat-badge">⚡ 50K TPS</span>
@@ -524,7 +523,7 @@ function Projects() {
           </div>
 
           <p className="project-desc">
-            Tier-1 service architecture at Amazon handling 40K–50K TPS of global order traffic. 
+            Tier-1 service infrastructure at Amazon handling 40K–50K TPS of global order traffic. 
             Cell-based deployment across 4 isolated regional fleets. Regression framework rewrite 
             boosted API coverage from 45% to 99%.
           </p>
