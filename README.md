@@ -1,16 +1,54 @@
-# React + Vite
+# Sridhar Suthapalli - Developer Portfolio
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+Welcome to my personal developer portfolio! This is an Apple-inspired, highly interactive single-page application built using React and Vite. It showcases my experience, projects, skills, and competitive programming achievements.
 
-Currently, two official plugins are available:
+## 🚀 Live Demo
+[https://Illuminati9.github.io](https://Illuminati9.github.io)
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Oxc](https://oxc.rs)
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/)
+## ✨ Features
+- **Apple-Inspired Design**: Clean aesthetics with glassmorphism, smooth animations, and typography focused on readability.
+- **Dark/Light Mode**: Full support for theme toggling using CSS variables.
+- **Interactive Timeline & Sections**: Smooth scrolling, count-up animations for statistics, and intersection observers for fade-in effects.
+- **Fully Responsive**: Optimized for both mobile and desktop experiences.
 
-## React Compiler
+## 🛠️ Tech Stack
+- **Framework**: React.js 19
+- **Build Tool**: Vite 8
+- **Styling**: Vanilla CSS (CSS Variables, Flexbox/Grid, Animations)
+- **Deployment**: GitHub Pages
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+## 📦 Running Locally
 
-## Expanding the ESLint configuration
+To run this project locally on your machine, follow these steps:
 
-If you are developing a production application, we recommend using TypeScript with type-aware lint rules enabled. Check out the [TS template](https://github.com/vitejs/vite/tree/main/packages/create-vite/template-react-ts) for information on how to integrate TypeScript and [`typescript-eslint`](https://typescript-eslint.io) in your project.
+1. **Clone the repository:**
+   ```bash
+   git clone https://github.com/Illuminati9/Illuminati9.github.io.git
+   cd Illuminati9.github.io
+   ```
+
+2. **Install dependencies:**
+   ```bash
+   npm install
+   ```
+
+3. **Start the development server:**
+   ```bash
+   npm run dev
+   ```
+
+4. **Build for production:**
+   ```bash
+   npm run build
+   ```
+
+## 📂 Project Structure
+- `src/App.jsx`: Main React component containing all portfolio sections (Hero, About, Experience, Projects, Skills, CP, Contact).
+- `src/index.css` & `src/App.css`: Global styles, CSS variables for theming, and component-specific styles.
+- `public/`: Static assets like images and logos.
+
+## 🤝 Let's Connect
+- [LinkedIn](https://linkedin.com/in/sridharsuthapalli)
+- [GitHub](https://github.com/Illuminati9)
+- [Codeforces](https://codeforces.com/profile/SridharSuthapalli)
+- [LeetCode](https://leetcode.com/u/Illuminati9)
