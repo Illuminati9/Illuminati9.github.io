@@ -1,0 +1,59 @@
+/* ──────────────────────────────────────────────────────
+   Confetti Effect Styles
+   ────────────────────────────────────────────────────── */
+
+.confetti-container {
+  position: fixed;
+  inset: 0;
+  z-index: 9500;
+  pointer-events: none;
+  overflow: hidden;
+}
+
+.confetti-particle {
+  position: absolute;
+  top: -10px;
+  animation: confettiFall ease-out forwards;
+  opacity: 0;
+  will-change: transform, opacity;
+}
+
+.confetti-rect {
+  width: 8px;
+  height: 14px;
+  border-radius: 2px;
+}
+
+.confetti-circle {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+}
+
+.confetti-strip {
+  width: 4px;
+  height: 16px;
+  border-radius: 2px;
+}
+
+@keyframes confettiFall {
+  0% {
+    opacity: 1;
+    transform:
+      translateY(0)
+      translateX(0)
+      rotate(0deg)
+      scale(var(--scale, 1));
+  }
+  20% {
+    opacity: 1;
+  }
+  100% {
+    opacity: 0;
+    transform:
+      translateY(100vh)
+      translateX(var(--drift, 0px))
+      rotate(calc(var(--rotation, 0deg) + 720deg))
+      scale(var(--scale, 1));
+  }
+}

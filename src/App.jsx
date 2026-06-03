@@ -1,4 +1,10 @@
 import { useState, useEffect, useRef, useCallback } from 'react'
+import { AchievementProvider, useAchievements } from './games/AchievementSystem'
+import GameHub from './games/GameHub'
+import MemoryGame from './games/MemoryGame'
+import TerminalGame from './games/TerminalGame'
+import KonamiEasterEgg from './games/KonamiEasterEgg'
+import ScrollFactPopup from './games/ScrollFactPopup'
 
 const NAV_OFFSET = 84
 const RESUME_URL = 'https://drive.google.com/file/d/1XahEoVfOsteb7ixsu8gVbq_H5o0-DF2k/view?usp=sharing'
@@ -215,7 +221,7 @@ function Navbar({ theme, toggleTheme }) {
           </a>
           <button
             className="theme-toggle"
-            onClick={toggleTheme}
+            onClick={() => { toggleTheme(); if (window.__unlockAchievement) window.__unlockAchievement('theme_switch') }}
             aria-label={`Switch to ${theme === 'dark' ? 'light' : 'dark'} mode`}
             title={`Switch to ${theme === 'dark' ? 'light' : 'dark'} mode`}
           >
@@ -1148,6 +1154,7 @@ function Contact() {
   const handleSubmit = async (e) => {
     e.preventDefault()
     setSending(true)
+    if (window.__unlockAchievement) window.__unlockAchievement('connector')
     const targetEmail = 'sridharsuthapalli49@gmail.com'
     const subjectRaw = `Portfolio Contact from ${form.name}`
     const bodyRaw = `Hi Sridhar,\n\n${form.message}\n\nFrom: ${form.name}\nEmail: ${form.email}`
@@ -1381,26 +1388,28 @@ function KeyboardNav({ setMenuOpen }) {
       // Don't trigger if user is typing in an input
       if (e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA' || e.target.isContentEditable) return
 
+      let used = false
       switch (e.key) {
-        case '?': setShowModal(s => !s); break
+        case '?': setShowModal(s => !s); used = true; break
         case 'Escape':
           setShowModal(false)
           if (setMenuOpen) setMenuOpen(false)
           break
         case 'g': case 'G':
-          if (!e.ctrlKey && !e.metaKey) window.open(GITHUB_URL, '_blank')
+          if (!e.ctrlKey && !e.metaKey) { window.open(GITHUB_URL, '_blank'); used = true }
           break
         case 'r': case 'R':
-          if (!e.ctrlKey && !e.metaKey) window.open(RESUME_URL, '_blank')
+          if (!e.ctrlKey && !e.metaKey) { window.open(RESUME_URL, '_blank'); used = true }
           break
-        case '1': scrollToSection('about'); break
-        case '2': scrollToSection('experience'); break
-        case '3': scrollToSection('projects'); break
-        case '4': scrollToSection('skills'); break
-        case '5': scrollToSection('cp'); break
-        case '6': scrollToSection('contact'); break
+        case '1': scrollToSection('about'); used = true; break
+        case '2': scrollToSection('experience'); used = true; break
+        case '3': scrollToSection('projects'); used = true; break
+        case '4': scrollToSection('skills'); used = true; break
+        case '5': scrollToSection('cp'); used = true; break
+        case '6': scrollToSection('contact'); used = true; break
         default: break
       }
+      if (used && window.__unlockAchievement) window.__unlockAchievement('keyboard_ninja')
     }
     window.addEventListener('keydown', handler)
     return () => window.removeEventListener('keydown', handler)
@@ -1468,16 +1477,22 @@ function Footer() {
   )
 }
 
-/* ── App Root ───────────────────────────────────────── */
-export default function App() {
-  const [loaded, setLoaded] = useState(() => {
-    return sessionStorage.getItem('loader-shown') === '1'
-  })
-  const [theme, toggleTheme] = useTheme()
+/* ── App Inner (needs achievement context) ─────────── */
+function AppInner({ theme, toggleTheme }) {
+  const [memoryOpen, setMemoryOpen] = useState(false)
+  const [terminalOpen, setTerminalOpen] = useState(false)
+  const achievements = useAchievements()
 
-  if (!loaded) {
-    return <Loader onFinish={() => setLoaded(true)} />
-  }
+  // Expose unlock globally for simple integrations
+  useEffect(() => {
+    window.__unlockAchievement = achievements?.unlock
+    return () => { delete window.__unlockAchievement }
+  }, [achievements])
+
+  const handleSelectGame = useCallback((gameId) => {
+    if (gameId === 'memory') setMemoryOpen(true)
+    else if (gameId === 'terminal') setTerminalOpen(true)
+  }, [])
 
   return (
     <>
@@ -1501,6 +1516,39 @@ export default function App() {
       <Footer />
       <OpenToWorkBanner />
       <BackToTop />
+
+      {/* Gamification Layer */}
+      <GameHub onSelectGame={handleSelectGame} />
+      <MemoryGame
+        isOpen={memoryOpen}
+        onClose={() => setMemoryOpen(false)}
+        onAchievement={achievements?.unlock}
+      />
+      <TerminalGame
+        isOpen={terminalOpen}
+        onClose={() => setTerminalOpen(false)}
+        onAchievement={achievements?.unlock}
+      />
+      <KonamiEasterEgg onAchievement={achievements?.unlock} />
+      <ScrollFactPopup onAchievement={achievements?.unlock} />
     </>
+  )
+}
+
+/* ── App Root ───────────────────────────────────────── */
+export default function App() {
+  const [loaded, setLoaded] = useState(() => {
+    return sessionStorage.getItem('loader-shown') === '1'
+  })
+  const [theme, toggleTheme] = useTheme()
+
+  if (!loaded) {
+    return <Loader onFinish={() => setLoaded(true)} />
+  }
+
+  return (
+    <AchievementProvider>
+      <AppInner theme={theme} toggleTheme={toggleTheme} />
+    </AchievementProvider>
   )
 }

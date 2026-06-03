@@ -2904,12 +2904,26 @@ textarea:focus-visible {
   }
 
   /* OTW banner mobile */
+  @keyframes bannerSlideUpMobile {
+    from {
+      opacity: 0;
+      transform: translateY(20px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+
   .otw-banner {
     bottom: 16px;
+    left: 16px;
+    transform: none;
     padding: 10px 14px;
     gap: 10px;
-    width: calc(100% - 32px);
+    width: calc(100% - 84px); /* 16px left margin + 16px right margin + ~52px game hub icon width */
     max-width: 400px;
+    animation-name: bannerSlideUpMobile;
   }
 
   .otw-text {

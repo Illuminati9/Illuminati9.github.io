@@ -1,0 +1,236 @@
+/* ──────────────────────────────────────────────────────
+   Game Hub Styles
+   ────────────────────────────────────────────────────── */
+
+/* ── Floating Trigger ────────────────────────────── */
+.gh-trigger {
+  position: fixed;
+  bottom: 24px;
+  right: 20px;
+  z-index: 6000;
+  width: 52px;
+  height: 52px;
+  border-radius: 50%;
+  border: 1px solid var(--glass-border-bright, rgba(255, 255, 255, 0.22));
+  background: var(--glass-bg-strong, rgba(255, 255, 255, 0.12));
+  backdrop-filter: blur(20px) saturate(180%);
+  -webkit-backdrop-filter: blur(20px) saturate(180%);
+  box-shadow:
+    0 8px 32px rgba(0, 0, 0, 0.4),
+    0 0 0 1px rgba(255, 255, 255, 0.05),
+    inset 0 1px 0 rgba(255, 255, 255, 0.15);
+  cursor: pointer;
+  appearance: none;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+.gh-trigger:hover {
+  transform: scale(1.1);
+  box-shadow:
+    0 12px 40px rgba(0, 0, 0, 0.5),
+    0 0 20px rgba(0, 122, 255, 0.15),
+    inset 0 1px 0 rgba(255, 255, 255, 0.2);
+  border-color: var(--accent, #007aff);
+}
+
+.gh-trigger-active {
+  background: var(--accent, #007aff);
+  border-color: var(--accent, #007aff);
+}
+
+.gh-trigger-icon {
+  font-size: 1.4rem;
+  transition: transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+.gh-trigger-active .gh-trigger-icon {
+  font-size: 1rem;
+  color: #fff;
+}
+
+.gh-trigger:hover .gh-trigger-icon {
+  transform: rotate(15deg);
+}
+
+.gh-trigger-active:hover .gh-trigger-icon {
+  transform: rotate(90deg);
+}
+
+/* Pulse animation to draw attention */
+.gh-trigger::before {
+  content: '';
+  position: absolute;
+  inset: -4px;
+  border-radius: 50%;
+  border: 2px solid var(--accent, #007aff);
+  opacity: 0;
+  animation: ghPulse 3s ease-in-out infinite 5s;
+}
+
+@keyframes ghPulse {
+  0%, 100% { opacity: 0; transform: scale(1); }
+  50% { opacity: 0.4; transform: scale(1.15); }
+}
+
+/* ── Backdrop ────────────────────────────────────── */
+.gh-backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: 5999;
+  background: transparent;
+}
+
+/* ── Menu ─────────────────────────────────────────── */
+.gh-menu {
+  position: fixed;
+  bottom: 86px;
+  right: 20px;
+  z-index: 6001;
+  min-width: 280px;
+  background: var(--glass-bg-strong, rgba(255, 255, 255, 0.12));
+  backdrop-filter: blur(40px) saturate(200%);
+  -webkit-backdrop-filter: blur(40px) saturate(200%);
+  border: 1px solid var(--glass-border-bright, rgba(255, 255, 255, 0.22));
+  border-radius: var(--radius-lg, 22px);
+  box-shadow:
+    0 16px 60px rgba(0, 0, 0, 0.5),
+    inset 0 1px 0 rgba(255, 255, 255, 0.12);
+  padding: 20px;
+  opacity: 0;
+  transform: translateY(16px) scale(0.92);
+  transition: opacity 0.3s ease, transform 0.35s cubic-bezier(0.34, 1.56, 0.64, 1);
+  pointer-events: none;
+}
+
+.gh-menu-visible {
+  opacity: 1;
+  transform: translateY(0) scale(1);
+  pointer-events: auto;
+}
+
+.gh-menu-title {
+  font-size: 1rem;
+  font-weight: 700;
+  color: var(--text-primary, #f5f5f7);
+  letter-spacing: -0.02em;
+  margin-bottom: 2px;
+}
+
+.gh-menu-subtitle {
+  font-size: 0.72rem;
+  color: var(--text-tertiary, #6e6e73);
+  margin-bottom: 16px;
+}
+
+.gh-game-list {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.gh-game-item {
+  appearance: none;
+  border: none;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 12px 14px;
+  background: var(--glass-bg, rgba(255, 255, 255, 0.06));
+  border: 1px solid var(--glass-border, rgba(255, 255, 255, 0.12));
+  border-radius: var(--radius-md, 16px);
+  cursor: pointer;
+  transition: all 0.2s ease;
+  text-align: left;
+  width: 100%;
+}
+
+.gh-game-item:hover {
+  background: var(--glass-bg-hover, rgba(255, 255, 255, 0.1));
+  border-color: var(--glass-border-bright, rgba(255, 255, 255, 0.22));
+  transform: translateX(4px);
+}
+
+.gh-game-icon {
+  font-size: 1.5rem;
+  flex-shrink: 0;
+}
+
+.gh-game-info {
+  display: flex;
+  flex-direction: column;
+  gap: 1px;
+  flex: 1;
+  min-width: 0;
+}
+
+.gh-game-name {
+  font-size: 0.85rem;
+  font-weight: 700;
+  color: var(--text-primary, #f5f5f7);
+  letter-spacing: -0.01em;
+}
+
+.gh-game-desc {
+  font-size: 0.7rem;
+  color: var(--text-tertiary, #6e6e73);
+}
+
+.gh-game-arrow {
+  font-size: 0.85rem;
+  color: var(--text-tertiary, #6e6e73);
+  flex-shrink: 0;
+  transition: transform 0.2s ease, color 0.2s ease;
+}
+
+.gh-game-item:hover .gh-game-arrow {
+  transform: translateX(3px);
+  color: var(--accent, #007aff);
+}
+
+/* ── Light Mode ─────────────────────────────────── */
+[data-theme="light"] .gh-trigger {
+  background: rgba(255, 255, 255, 0.8);
+  border-color: rgba(0, 0, 0, 0.1);
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+}
+
+[data-theme="light"] .gh-trigger:hover {
+  border-color: var(--accent, #007aff);
+  box-shadow: 0 12px 40px rgba(0, 0, 0, 0.15);
+}
+
+[data-theme="light"] .gh-menu {
+  background: rgba(255, 255, 255, 0.9);
+  border-color: rgba(0, 0, 0, 0.1);
+  box-shadow: 0 16px 60px rgba(0, 0, 0, 0.12);
+}
+
+[data-theme="light"] .gh-game-item {
+  background: rgba(0, 0, 0, 0.03);
+  border-color: rgba(0, 0, 0, 0.06);
+}
+
+[data-theme="light"] .gh-game-item:hover {
+  background: rgba(0, 0, 0, 0.05);
+  border-color: rgba(0, 0, 0, 0.1);
+}
+
+/* ── Responsive ─────────────────────────────────── */
+@media (max-width: 480px) {
+  .gh-trigger {
+    width: 48px;
+    height: 48px;
+    bottom: 20px;
+    right: 16px;
+  }
+
+  .gh-menu {
+    right: 16px;
+    bottom: 78px;
+    min-width: 260px;
+    padding: 16px;
+  }
+}
