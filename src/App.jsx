@@ -942,6 +942,7 @@ function CFRatingChart() {
       delta,
       date: new Date(d.ratingUpdateTimeSeconds * 1000).toLocaleDateString('en-US', { month: 'short', year: 'numeric' }),
     })
+    if (window.__unlockAchievement) window.__unlockAchievement('data_nerd')
   }
 
   return (
