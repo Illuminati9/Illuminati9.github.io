@@ -2121,6 +2121,8 @@ textarea:focus-visible {
   font-size: 0.88rem;
   font-weight: 500;
   color: var(--text-primary);
+  word-break: break-word;
+  overflow-wrap: anywhere;
 }
 
 .contact-form-card {
