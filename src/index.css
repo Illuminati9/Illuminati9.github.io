@@ -48,6 +48,7 @@
   --section-padding: clamp(72px, 9vw, 100px) 0;
   --container-max: 1100px;
   --container-pad: 0 clamp(16px, 3vw, 24px);
+  --back-to-top-banner-offset: 96px;
 
   /* Radius */
   --radius-sm: 10px;
@@ -2444,7 +2445,7 @@ textarea:focus-visible {
 }
 
 .otw-banner + .back-to-top-btn {
-  bottom: 96px;
+  bottom: var(--back-to-top-banner-offset);
 }
 
 .back-to-top-btn:hover {
@@ -2871,7 +2872,7 @@ textarea:focus-visible {
   }
 
   .otw-banner + .back-to-top-btn {
-    bottom: 96px !important;
+    bottom: var(--back-to-top-banner-offset) !important;
   }
 
   /* Skills layout mobile */
