@@ -233,6 +233,8 @@
 html {
   scroll-behavior: smooth;
   font-size: 16px;
+  overflow-x: hidden;
+  width: 100%;
 }
 
 body {
@@ -241,6 +243,7 @@ body {
   color: var(--text-primary);
   line-height: 1.6;
   overflow-x: hidden;
+  width: 100%;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
 }
@@ -747,6 +750,7 @@ textarea:focus-visible {
   text-align: center;
   max-width: 800px;
   width: min(100%, 800px);
+  min-width: 0;
 }
 
 .hero-avatar-wrap {
@@ -781,7 +785,7 @@ textarea:focus-visible {
   align-items: center;
   gap: 5px;
   padding: 4px 10px;
-  max-width: min(240px, calc(100% - 32px));
+  max-width: min(250px, calc(100% - 10px));
   background: rgba(0, 0, 0, 0.7);
   backdrop-filter: blur(10px);
   border: 1px solid rgba(255, 255, 255, 0.12);
@@ -2348,7 +2352,7 @@ textarea:focus-visible {
 }
 
 .kb-modal {
-  width: min(420px, 90%);
+  width: min(90vw, 420px);
   padding: 28px 32px;
   background: rgba(20, 20, 25, 0.95) !important;
   border: 1px solid rgba(255, 255, 255, 0.15) !important;
