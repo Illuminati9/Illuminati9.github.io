@@ -90,9 +90,7 @@
   right: 20px;
   z-index: 6001;
   min-width: 280px;
-  background: var(--glass-bg-strong, rgba(255, 255, 255, 0.12));
-  backdrop-filter: blur(40px) saturate(200%);
-  -webkit-backdrop-filter: blur(40px) saturate(200%);
+  background: var(--bg-secondary, #0a0a0f);
   border: 1px solid var(--glass-border-bright, rgba(255, 255, 255, 0.22));
   border-radius: var(--radius-lg, 22px);
   box-shadow:
@@ -203,7 +201,7 @@
 }
 
 [data-theme="light"] .gh-menu {
-  background: rgba(255, 255, 255, 0.9);
+  background: var(--bg-secondary, #ffffff);
   border-color: rgba(0, 0, 0, 0.1);
   box-shadow: 0 16px 60px rgba(0, 0, 0, 0.12);
 }
