@@ -555,6 +555,7 @@ textarea:focus-visible {
 
 .navbar-inner {
   max-width: var(--container-max);
+  width: min(calc(100vw - 48px), var(--container-max));
   margin: 0 auto;
   display: flex;
   align-items: center;
@@ -2442,6 +2443,10 @@ textarea:focus-visible {
   transition: opacity 0.3s ease, transform 0.3s cubic-bezier(0.34, 1.5, 0.64, 1);
 }
 
+.otw-banner + .back-to-top-btn {
+  bottom: 96px;
+}
+
 .back-to-top-btn:hover {
   background: rgba(0, 0, 0, 0.8);
   transform: translateY(-2px) scale(1.05) !important;
@@ -2661,6 +2666,7 @@ textarea:focus-visible {
     height: 50px;
     padding: 0 14px;
     margin-top: 10px;
+    width: min(calc(100vw - 24px), var(--container-max));
   }
 
   .navbar-inner:hover,
@@ -2864,6 +2870,10 @@ textarea:focus-visible {
     bottom: 16px !important;
   }
 
+  .otw-banner + .back-to-top-btn {
+    bottom: 96px !important;
+  }
+
   /* Skills layout mobile */
   .skills-layout {
     grid-template-columns: 1fr;
@@ -2940,6 +2950,10 @@ textarea:focus-visible {
 
   .navbar {
     padding: 0 8px;
+  }
+
+  .navbar-inner {
+    width: min(calc(100vw - 16px), var(--container-max));
   }
 
   .navbar-logo {
