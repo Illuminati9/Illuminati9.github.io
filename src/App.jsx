@@ -152,12 +152,23 @@ function Loader({ onFinish }) {
   )
 }
 
+const SECTION_IDS = ['home', 'about', 'experience', 'projects', 'skills', 'cp', 'contact']
+
 /* ── Navbar ────────────────────────────────────────── */
 function Navbar({ theme, toggleTheme }) {
   const [scrolled, setScrolled] = useState(false)
   const [menuOpen, setMenuOpen] = useState(false)
-  const sectionIds = ['home', 'about', 'experience', 'projects', 'skills', 'cp', 'contact']
-  const [active, setActive] = useActiveSection(sectionIds)
+  const [active, setActive] = useActiveSection(SECTION_IDS)
+  const visitedRef = useRef(new Set())
+
+  useEffect(() => {
+    if (active && !visitedRef.current.has(active)) {
+      visitedRef.current.add(active)
+      if (visitedRef.current.size === SECTION_IDS.length) {
+        if (window.__unlockAchievement) window.__unlockAchievement('explorer')
+      }
+    }
+  }, [active])
 
   useEffect(() => {
     const onScroll = () => setScrolled(window.scrollY > 40)
