@@ -556,7 +556,7 @@ textarea:focus-visible {
 
 .navbar-inner {
   max-width: var(--container-max);
-  width: min(calc(100vw - 48px), var(--container-max));
+  width: 100%;
   margin: 0 auto;
   display: flex;
   align-items: center;
@@ -781,7 +781,7 @@ textarea:focus-visible {
   align-items: center;
   gap: 5px;
   padding: 4px 10px;
-  max-width: min(240px, calc(100vw - 32px));
+  max-width: min(240px, calc(100% - 32px));
   background: rgba(0, 0, 0, 0.7);
   backdrop-filter: blur(10px);
   border: 1px solid rgba(255, 255, 255, 0.12);
@@ -2348,7 +2348,7 @@ textarea:focus-visible {
 }
 
 .kb-modal {
-  width: min(420px, 90vw);
+  width: min(420px, 90%);
   padding: 28px 32px;
   background: rgba(20, 20, 25, 0.95) !important;
   border: 1px solid rgba(255, 255, 255, 0.15) !important;
@@ -2644,7 +2644,7 @@ textarea:focus-visible {
 
   .loader-content {
     width: min(100%, 360px);
-    max-width: calc(100vw - 32px);
+    max-width: calc(100% - 32px);
   }
 
   .loader-logos {
@@ -2671,7 +2671,7 @@ textarea:focus-visible {
     height: 50px;
     padding: 0 14px;
     margin-top: 10px;
-    width: min(calc(100vw - 24px), var(--container-max));
+    width: 100%;
   }
 
   .navbar-inner:hover,
@@ -2958,7 +2958,7 @@ textarea:focus-visible {
   }
 
   .navbar-inner {
-    width: min(calc(100vw - 16px), var(--container-max));
+    width: 100%;
   }
 
   .navbar-logo {
